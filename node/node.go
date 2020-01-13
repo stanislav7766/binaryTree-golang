@@ -1,102 +1,107 @@
 package node
 
-import "errors"
-
+// Node a single node that composes the tree
 type Node struct {
+	Key   int
 	Value string
-	Data  string
-	Left  *Node
-	Right *Node
+	Left  *Node //left
+	Right *Node //right
 }
 
-func (n *Node) Insert(value, data string) error {
-
-	if n == nil {
-		return errors.New("Cannot insert a value into a nil tree")
+//InsertNode internal function to find the correct place for a node in a tree
+func InsertNode(node *Node, newNode *Node) {
+	if newNode.Key < node.Key {
+		if node.Left == nil {
+			node.Left = newNode
+		} else {
+			InsertNode(node.Left, newNode)
+		}
+	} else {
+		if node.Right == nil {
+			node.Right = newNode
+		} else {
+			InsertNode(node.Right, newNode)
+		}
 	}
+}
 
-	switch {
-	case value == n.Value:
+// InOrderTraverse internal recursive function to traverse in order
+func InOrderTraverse(node *Node, f func(string)) {
+	if node != nil {
+		InOrderTraverse(node, f)
+		f(node.Value)
+		InOrderTraverse(node, f)
+	}
+}
+
+// PreOrderTraverse internal recursive function to traverse pre order
+func PreOrderTraverse(node *Node, f func(string)) {
+	if node != nil {
+		f(node.Value)
+		PreOrderTraverse(node.Left, f)
+		PreOrderTraverse(node.Right, f)
+	}
+}
+
+// PostOrderTraverse internal recursive function to traverse post order
+func PostOrderTraverse(node *Node, f func(string)) {
+	if node != nil {
+		PostOrderTraverse(node.Left, f)
+		PostOrderTraverse(node.Right, f)
+		f(node.Value)
+	}
+}
+
+// Search internal recursive function to search an item in the tree
+func Search(node *Node, key int) bool {
+	if node == nil {
+		return false
+	}
+	if key < node.Key {
+		return Search(node.Left, key)
+	}
+	if key > node.Key {
+		return Search(node.Right, key)
+	}
+	return true
+}
+
+//Remove internal recursive function to remove an item
+func Remove(node *Node, key int) *Node {
+	if node == nil {
 		return nil
-	case value < n.Value:
-		if n.Left == nil {
-			n.Left = &Node{Value: value, Data: data}
-			return nil
-		}
-		return n.Left.Insert(value, data)
-	case value > n.Value:
-		if n.Right == nil {
-			n.Right = &Node{Value: value, Data: data}
-			return nil
-		}
-		return n.Right.Insert(value, data)
 	}
-	return nil
-}
-
-func (n *Node) findMax(parent *Node) (*Node, *Node) {
-	if n == nil {
-		return nil, parent
+	if key < node.Key {
+		node.Left = Remove(node.Left, key)
+		return node
 	}
-	if n.Right == nil {
-		return n, parent
+	if key > node.Key {
+		node.Right = Remove(node.Right, key)
+		return node
 	}
-	return n.Right.findMax(n)
-}
-
-func (n *Node) replaceNode(parent, replacement *Node) error {
-	if n == nil {
-		return errors.New("replaceNode() not allowed on a nil node")
-	}
-
-	if n == parent.Left {
-		parent.Left = replacement
+	// key == node.key
+	if node.Left == nil && node.Right == nil {
+		node = nil
 		return nil
 	}
-	parent.Right = replacement
-	return nil
-}
-func (n *Node) Delete(s string, parent *Node) error {
-	if n == nil {
-		return errors.New("Value to be deleted does not exist in the tree")
+	if node.Left == nil {
+		node = node.Right
+		return node
 	}
-	switch {
-	case s < n.Value:
-		return n.Left.Delete(s, n)
-	case s > n.Value:
-		return n.Right.Delete(s, n)
-	default:
-		if n.Left == nil && n.Right == nil {
-			n.replaceNode(parent, nil)
-			return nil
+	if node.Right == nil {
+		node = node.Left
+		return node
+	}
+	leftmostrightside := node.Right
+	for {
+		//find smallest value on the right side
+		if leftmostrightside != nil && leftmostrightside.Left != nil {
+			leftmostrightside = leftmostrightside.Left
+		} else {
+			break
 		}
-		if n.Left == nil {
-			n.replaceNode(parent, n.Right)
-			return nil
-		}
-		if n.Right == nil {
-			n.replaceNode(parent, n.Left)
-			return nil
-		}
-		replacement, replParent := n.Left.findMax(n)
-		n.Value = replacement.Value
-		n.Data = replacement.Data
-		return replacement.Delete(replacement.Value, replParent)
 	}
-}
-
-func (n *Node) Find(s string) (string, bool) {
-
-	if n == nil {
-		return "", false
-	}
-
-	switch {
-	case s == n.Value:
-		return n.Data, true
-	case s < n.Value:
-		return n.Left.Find(s)
-	default:
-		return n.Right.Find(s)
-	}
+	node.Key, node.Value = leftmostrightside.Key, leftmostrightside.Value
+	node.Right = Remove(node.Right, node.Key)
+	return node
 }
