@@ -29,6 +29,10 @@ func main() {
 	myTree.Remove(7)
 	myTree.Remove(1)
 	myTree.String()
+	fmt.Println("after clearing:")
+	myTree.Clear()
+	myTree.String()
+
 	fmt.Printf("count: %d\n", myTree.GetCount())
 
 }

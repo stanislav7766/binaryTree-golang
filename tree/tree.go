@@ -23,8 +23,8 @@ func (bst *Tree) Insert(key int, value string) {
 	bst.Count++
 }
 
-// InOrderTraverse visits all nodes with in-order traversing
-func (bst *Tree) InOrderTraverse(f func(string)) {
+// InOrderTraverse visits all nodes with in-order traversing dfs
+func (bst *Tree) InOrderTraverse(f func(n *node.Node)) {
 	if bst.Root == nil {
 		return
 	}
@@ -36,16 +36,29 @@ func (bst *Tree) GetCount() int {
 	return bst.Count
 }
 
-// PreOrderTraverse visits all nodes with pre-order traversing
-func (bst *Tree) PreOrderTraverse(f func(string)) {
+// PreOrderTraverse visits all nodes with pre-order traversing dfs
+func (bst *Tree) PreOrderTraverse(f func(n *node.Node)) {
 	if bst.Root == nil {
 		return
 	}
 	node.PreOrderTraverse(bst.Root, f)
 }
 
-// PostOrderTraverse visits all nodes with post-order traversing
-func (bst *Tree) PostOrderTraverse(f func(string)) {
+//Clear remove all nodes
+func (bst *Tree) Clear() {
+	bst.PostOrderTraverse(func(n *node.Node) {
+		if n == bst.Root {
+			bst.Root = nil
+		}
+		bst.Count--
+		n.Left = nil
+		n.Right = nil
+		n = nil
+	})
+}
+
+// PostOrderTraverse visits all nodes with post-order traversing dfs
+func (bst *Tree) PostOrderTraverse(f func(n *node.Node)) {
 	if bst.Root == nil {
 		return
 	}

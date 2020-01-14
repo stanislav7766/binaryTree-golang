@@ -26,29 +26,29 @@ func InsertNode(node *Node, newNode *Node) {
 }
 
 // InOrderTraverse internal recursive function to traverse in order
-func InOrderTraverse(node *Node, f func(string)) {
+func InOrderTraverse(node *Node, f func(n *Node)) {
 	if node != nil {
 		InOrderTraverse(node, f)
-		f(node.Value)
+		f(node)
 		InOrderTraverse(node, f)
 	}
 }
 
 // PreOrderTraverse internal recursive function to traverse pre order
-func PreOrderTraverse(node *Node, f func(string)) {
+func PreOrderTraverse(node *Node, f func(n *Node)) {
 	if node != nil {
-		f(node.Value)
+		f(node)
 		PreOrderTraverse(node.Left, f)
 		PreOrderTraverse(node.Right, f)
 	}
 }
 
 // PostOrderTraverse internal recursive function to traverse post order
-func PostOrderTraverse(node *Node, f func(string)) {
+func PostOrderTraverse(node *Node, f func(n *Node)) {
 	if node != nil {
 		PostOrderTraverse(node.Left, f)
 		PostOrderTraverse(node.Right, f)
-		f(node.Value)
+		f(node)
 	}
 }
 
